@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a1a">
+<title>FireWatch — Wildfire alerts &amp; help</title>
+<style>
+:root{--bg:#f6f5f2;--surface:#fff;--ink:#1a1a1a;--muted:#55575c;--line:#d9d7d1;--l4:#b91c1c;--l3:#c2410c;--l2:#facc15;--l1:#1d4ed8;--ok:#15803d;--help:#0f5f8a;--r:14px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top,0px)}
+h1,h2,h3{margin:0;line-height:1.2}button{font:inherit}a{color:inherit}
+:focus-visible{outline:4px solid #0ea5e9;outline-offset:2px}
+header{background:var(--ink);color:#fff;position:sticky;top:0;z-index:20}
+header div{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:19px;text-decoration:none}.logo span{color:#fb923c}
+.sos{background:var(--l4);color:#fff;font-weight:800;border-radius:999px;padding:10px 16px;text-decoration:none;font-size:15px;white-space:nowrap}
+main{max-width:760px;margin:0 auto;padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px))}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:2px solid var(--ink);display:grid;grid-template-columns:repeat(5,1fr);z-index:20;padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs a{text-align:center;text-decoration:none;padding:8px 2px 9px;font-size:12px;font-weight:700;color:var(--muted);display:block}.tabs a b{display:block;font-size:22px;line-height:1.1}
+.tabs a.on{color:var(--ink);box-shadow:inset 0 4px 0 var(--l3)}.tabs a.rep b{color:var(--l4)}
+.btn{display:block;width:100%;text-align:center;font-weight:800;font-size:18px;border:3px solid var(--ink);border-radius:var(--r);padding:15px 18px;cursor:pointer;background:var(--surface);color:var(--ink);text-decoration:none;min-height:56px}
+.btn:active{transform:scale(.98)}.btn.red{background:var(--l4);border-color:var(--l4);color:#fff}.btn.help{background:var(--help);border-color:var(--help);color:#fff}.btn.sm{width:auto;display:inline-block;min-height:44px;font-size:15px;padding:9px 16px}.btn:disabled{opacity:.45}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1}
+.badge{display:inline-flex;gap:5px;align-items:center;font-weight:800;font-size:13px;letter-spacing:.03em;text-transform:uppercase;padding:3px 10px;border-radius:6px}
+.muted{color:var(--muted);font-size:15px}
+.alert{border:2px solid var(--line);border-left-width:10px;border-radius:var(--r);padding:12px 14px;margin-bottom:10px;background:var(--surface)}
+.alert h3{font-size:18px;margin:6px 0 2px}.alert p{margin:0}
+.hero{border-left-width:12px;font-size:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.big{border:3px solid var(--ink);border-radius:var(--r);padding:14px;font-weight:800;font-size:17px;text-align:left;background:var(--surface);cursor:pointer;text-decoration:none;display:block;min-height:96px}.big b{display:block;font-size:28px}
+.map{width:100%;border-radius:var(--r);border:2px solid var(--ink);background:#e7efdc;display:block;touch-action:manipulation}
+.map .pin{cursor:pointer}.map .pin:focus-visible circle.main{stroke:#0ea5e9;stroke-width:1.4}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{border:2px solid var(--ink);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;cursor:pointer;min-height:40px}.chip[aria-pressed=true]{background:var(--ink);color:#fff}
+.sheet{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:4px solid var(--ink);border-radius:18px 18px 0 0;padding:16px;z-index:15;max-width:760px;margin:0 auto;box-shadow:0 -8px 24px rgba(0,0,0,.2)}
+.steps{display:flex;gap:6px;margin-bottom:14px}.steps i{flex:1;height:8px;border-radius:4px;background:var(--line)}.steps i.on{background:var(--ink)}
+.opt{display:grid;gap:10px;margin:12px 0}.opt button{text-align:left}.opt .btn[aria-pressed=true]{background:var(--ink);color:#fff}
+label{font-weight:700;display:block;margin-bottom:4px}input[type=text],input[type=number],input[type=email],textarea,select{width:100%;font:inherit;font-size:17px;padding:13px;border:2px solid var(--ink);border-radius:12px;background:#fff}
+.err{color:var(--l4);font-weight:700;margin:6px 0}.ok{background:#dcfce7;border:2px solid var(--ok);border-radius:var(--r);padding:18px;text-align:center}
+.check label{display:flex;gap:12px;align-items:center;font-weight:600;padding:12px 0;border-bottom:1px solid var(--line);margin:0}.check input{width:26px;height:26px;accent-color:#15803d}
+h2.t{font-size:26px;margin:6px 0 12px}h3.s{font-size:19px;margin:18px 0 8px}
+.spec{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;align-items:center}
+@media (min-width:700px){.grid2{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+<header><div><a class="logo" href="#/">🔥 Fire<span>Watch</span></a><a class="sos" id="sos" href="tel:14">Call 14 — Emergency</a></div></header>
+<main id="app"></main>
+<div id="sheet"></div>
+<nav class="tabs" aria-label="Main"><a href="#/" data-t="">  <b>🗺</b>Map</a><a href="#/alerts" data-t="alerts"><b>🔔</b>Alerts</a><a href="#/report" class="rep" data-t="report"><b>🔥</b>Report</a><a href="#/help" data-t="help"><b>🤝</b>Help</a><a href="#/safety" data-t="safety"><b>🛟</b>Safety</a></nav>
+<script>
+/* ===== Config & sample data (replace with your API) ===== */
+var EMERGENCY="14"; /* edit to your local emergency number */
+var LV={4:{n:"Evacuate",c:"#b91c1c",t:"#fff",g:"⛔",d:"Leave now"},3:{n:"Warning",c:"#c2410c",t:"#fff",g:"▲",d:"Be ready to leave"},2:{n:"Watch",c:"#facc15",t:"#1a1a1a",g:"●",d:"Stay alert"},1:{n:"Advisory",c:"#1d4ed8",t:"#fff",g:"◆",d:"Smoke or low risk"}};
+var INC=[
+{id:1,name:"Cedar Ridge Fire",lvl:4,x:62,y:30,r:15,ha:420,ago:6,status:"Active",dir:"Spreading north-east",txt:"Leave immediately via Route 7 to the south. Do not use the forest road."},
+{id:2,name:"Olive Valley Fire",lvl:3,x:30,y:58,r:12,ha:150,ago:14,status:"Active",dir:"Spreading east",txt:"Pack essentials and be ready to leave within the hour."},
+{id:3,name:"Quarry Hill Brush Fire",lvl:2,x:76,y:72,r:9,ha:30,ago:35,status:"Contained 40%",dir:"Slow spread",txt:"Stay alert and keep windows closed. Check updates every 30 minutes."},
+{id:4,name:"Coast Road Smoke",lvl:1,x:18,y:20,r:7,ha:5,ago:52,status:"Monitoring",dir:"Smoke only",txt:"Air quality is poor. Limit outdoor activity."}];
+var SHEL=[["Town Sports Hall","2.1 km",120,"Open"],["Central School Gym","4.8 km",0,"Full"],["Community Center South","7.3 km",64,"Open"]];
+var ORG=[["Regional Fire Relief Fund","Equipment and support for firefighters"],["Families First Recovery","Housing and supplies for evacuees"],["Animal Rescue Network","Shelter and care for pets and livestock"]];
+var NEEDS=[["Drive evacuees to shelter","Needed today"],["Sort food and water donations","Needed today"],["Host pets or livestock","Needed this week"]];
+var $=function(i){return document.getElementById(i)},app=$("app"),sel=null,fl={1:1,2:1,3:1,4:1};
+$("sos").href="tel:"+EMERGENCY;$("sos").textContent="Call "+EMERGENCY+" — Emergency";
+/* ===== Reusable components (data in → HTML out) ===== */
+function badge(l){var v=LV[l];return '<span class="badge" style="background:'+v.c+';color:'+v.t+'">'+v.g+' '+v.n+'</span>'}
+function alertBox(l,title,txt,meta,cls){var v=LV[l];return '<div class="alert '+(cls||'')+'" role="'+(l>=3?'alert':'status')+'" style="border-left-color:'+v.c+'">'+badge(l)+'<h3>'+title+'</h3><p>'+txt+'</p>'+(meta?'<p class="muted" style="margin-top:4px">'+meta+'</p>':'')+'</div>'}
+function pin(i,s){var v=LV[i.lvl];return '<g class="pin" data-pin="'+i.id+'" tabindex="0" role="button" aria-label="'+i.name+', '+v.n+'"><circle cx="'+i.x+'" cy="'+i.y+'" r="'+(s?5.6:4.4)+'" fill="'+v.c+'" stroke="'+(s?'#0ea5e9':'#fff')+'" stroke-width="'+(s?1.4:.9)+'" class="main"/><text x="'+i.x+'" y="'+(i.y+1.6)+'" text-anchor="middle" font-size="4.6" fill="'+v.t+'" font-weight="700">'+v.g+'</text></g>'}
+function incCard(i){var v=LV[i.lvl];return '<div class="card" style="border-color:'+v.c+'">'+badge(i.lvl)+' <span class="muted">'+i.status+' · updated '+i.ago+' min ago</span><h3 style="margin:6px 0 2px">'+i.name+'</h3><p style="margin:0 0 8px">'+i.txt+'</p><p class="muted" style="margin:0">'+i.dir+' · about '+i.ha+' ha</p></div>'}
+function mapSVG(o){o=o||{};var z=INC.filter(function(i){return fl[i.lvl]}).sort(function(a,b){return a.lvl-b.lvl});
+return '<svg class="map" id="map" viewBox="0 0 100 100" role="img" aria-label="Map of active fires"><path d="M0 70 C25 60 40 85 100 62 L100 100 L0 100Z" fill="#cfe0b8"/><path d="M0 38 C20 30 35 48 55 40 S85 50 100 44" stroke="#8fb7d9" stroke-width="3" fill="none"/><path d="M10 0 L35 100 M0 85 L100 15" stroke="#fff" stroke-width="1.4" opacity=".9"/>'+
+z.map(function(i){return '<circle cx="'+i.x+'" cy="'+i.y+'" r="'+i.r+'" fill="'+LV[i.lvl].c+'" fill-opacity=".22" stroke="'+LV[i.lvl].c+'" stroke-width=".7" stroke-dasharray="2 1.5"/>'}).join("")+
+z.map(function(i){return pin(i,sel===i.id)}).join("")+'<g><circle cx="46" cy="52" r="2.6" fill="#0ea5e9" stroke="#fff" stroke-width="1"/><text x="46" y="60" font-size="3.4" text-anchor="middle" font-weight="700" fill="#1a1a1a">You</text></g>'+(o.rep?'<g><circle cx="'+o.rep.x+'" cy="'+o.rep.y+'" r="4" fill="#b91c1c" stroke="#fff" stroke-width="1"/><text x="'+o.rep.x+'" y="'+(o.rep.y+1.6)+'" font-size="4.6" text-anchor="middle" fill="#fff">🔥</text></g>':'')+'</svg>'}
+function legend(){return '<div class="legend" role="group" aria-label="Filter by danger level">'+[4,3,2,1].map(function(l){return '<button class="chip" data-fl="'+l+'" aria-pressed="'+!!fl[l]+'">'+LV[l].g+' '+LV[l].n+'</button>'}).join("")+'</div>'}
+/* ===== Router ===== */
+var R={step:1,x:null,y:null,size:"",ppl:"",note:""},DN={amt:2500,org:0,mo:false},SENT=null,DONE=null;
+function route(){var h=location.hash.replace(/^#\/?/,"").split("/")[0];$("sheet").innerHTML="";sel=null;window.scrollTo(0,0);
+document.querySelectorAll(".tabs a").forEach(function(a){a.classList.toggle("on",a.dataset.t===(h==="donate"||h==="sent"?(h==="sent"?"report":"help"):h==="components"?"x":h))});
+({"":home,alerts:alerts,report:report,sent:sent,help:help,donate:donate,donated:donated,safety:safety,components:comps})[h]?({"":home,alerts:alerts,report:report,sent:sent,help:help,donate:donate,donated:donated,safety:safety,components:comps})[h]():home()}
+window.addEventListener("hashchange",route);
+/* ===== Pages ===== */
+function topInc(){return INC.slice().sort(function(a,b){return b.lvl-a.lvl})[0]}
+function home(){var t=topInc();app.innerHTML=alertBox(t.lvl,t.name+": "+LV[t.lvl].d,t.txt,"Updated "+t.ago+" min ago · "+t.status,"hero")+
+'<div class="grid2"><a class="big" href="#/safety" style="background:var(--l4);color:#fff;border-color:var(--l4)"><b>⛔</b>I must evacuate</a><a class="big" href="#/report"><b>🔥</b>Report a fire</a><a class="big" href="#/help"><b>🏠</b>Find shelter</a><a class="big" href="#/donate"><b>💙</b>Donate</a></div>'+
+'<h2 class="t">Fires near you</h2>'+legend()+mapSVG()+'<p class="muted">Tap a pin for details. Dashed areas show the danger zone.</p><h3 class="s">Active incidents</h3>'+INC.slice().sort(function(a,b){return b.lvl-a.lvl}).map(function(i){return '<div data-pin="'+i.id+'" style="cursor:pointer">'+incCard(i)+'</div>'}).join("")}
+function alerts(){app.innerHTML='<h2 class="t">Alerts</h2>'+INC.slice().sort(function(a,b){return b.lvl-a.lvl}).map(function(i){return alertBox(i.lvl,i.name,i.txt,i.status+' · '+i.ago+' min ago')}).join("")+
+'<h3 class="s">Get warned automatically</h3><div class="card check"><label><input type="checkbox" checked> Push notifications</label><label><input type="checkbox" checked> SMS for Warning and Evacuate</label><label><input type="checkbox"> Notify me for fires within 10 km</label></div><p class="muted">In this prototype settings are not saved.</p>'}
+function stepBar(){return '<div class="steps" aria-label="Step '+R.step+' of 3">'+[1,2,3].map(function(n){return '<i class="'+(n<=R.step?'on':'')+'"></i>'}).join("")+'</div>'}
+function report(){var s=R.step,h='<h2 class="t">Report a fire</h2><div class="alert" style="border-left-color:var(--l4)"><b>Is someone in immediate danger?</b> Call <a href="tel:'+EMERGENCY+'" style="font-weight:800">'+EMERGENCY+'</a> first.</div>'+stepBar();
+if(s===1)h+='<h3 class="s" style="margin-top:0">1. Where is the fire?</h3><p class="muted">Tap the map to place the fire, or use your location.</p>'+mapSVG({rep:R.x!=null?R:null}).replace('id="map"','id="map" data-pick="1"')+'<div class="row" style="margin-top:12px"><button class="btn" id="loc">📍 Use my location</button></div><div class="err" id="e"></div><button class="btn red" id="nx" style="margin-top:8px">Next</button>';
+if(s===2)h+='<h3 class="s" style="margin-top:0">2. What do you see?</h3><label>How big is it?</label><div class="opt">'+[["small","Small — a few meters"],["medium","Medium — a tree or building"],["large","Large — spreading fast"]].map(function(o){return '<button class="btn" data-size="'+o[0]+'" aria-pressed="'+(R.size===o[0])+'">'+o[1]+'</button>'}).join("")+'</div><label>Are people or homes in danger?</label><div class="opt"><div class="row"><button class="btn" data-ppl="yes" aria-pressed="'+(R.ppl==="yes")+'">Yes</button><button class="btn" data-ppl="no" aria-pressed="'+(R.ppl==="no")+'">No</button><button class="btn" data-ppl="unsure" aria-pressed="'+(R.ppl==="unsure")+'">Not sure</button></div></div><div class="err" id="e"></div><div class="row"><button class="btn" id="bk">Back</button><button class="btn red" id="nx">Next</button></div>';
+if(s===3)h+='<h3 class="s" style="margin-top:0">3. Check and send</h3><div class="card"><b>Size:</b> '+R.size+'<br><b>People in danger:</b> '+R.ppl+'<br><b>Location:</b> '+Math.round(R.x)+', '+Math.round(R.y)+' on map</div><label for="nt">Extra details (optional)</label><textarea id="nt" rows="3" placeholder="Wind direction, road names, landmarks">'+R.note+'</textarea><div class="row" style="margin-top:12px"><button class="btn" id="bk">Back</button><button class="btn red" id="send">Send report</button></div>';
+app.innerHTML=h}
+function sent(){if(!SENT){location.hash="#/report";return}app.innerHTML='<div class="ok"><div style="font-size:48px">✅</div><h2 class="t">Report sent</h2><p>Reference <b>'+SENT+'</b>. Responders have been notified.</p></div><h3 class="s">While you wait</h3><div class="card check"><label><input type="checkbox"> Move away from the fire and smoke</label><label><input type="checkbox"> Keep your phone on and charged</label><label><input type="checkbox"> Do not try to fight a large fire</label></div><a class="btn red" href="#/safety">Evacuation steps</a><a class="btn" href="#/" style="margin-top:10px">Back to map</a>'}
+function help(){app.innerHTML='<h2 class="t">Get help or help others</h2><h3 class="s" style="margin-top:0">Shelters</h3>'+SHEL.map(function(s){return '<div class="card"><b>'+s[0]+'</b> <span class="badge" style="background:'+(s[3]==="Open"?"#15803d":"#55575c")+';color:#fff">'+s[3]+'</span><div class="muted">'+s[1]+' away · '+s[2]+' beds free</div></div>'}).join("")+
+'<h3 class="s">Volunteer</h3>'+NEEDS.map(function(n,i){return '<div class="card"><b>'+n[0]+'</b><div class="muted">'+n[1]+'</div><button class="btn sm" data-vol="'+i+'" style="margin-top:8px">I can help</button></div>'}).join("")+'<a class="btn help" href="#/donate" style="margin-top:12px">💙 Donate to relief</a>'}
+function donate(){app.innerHTML='<h2 class="t">Donate</h2><label>Choose a cause</label><div class="opt">'+ORG.map(function(o,i){return '<button class="btn" data-org="'+i+'" aria-pressed="'+(DN.org===i)+'" style="text-align:left">'+o[0]+'<div class="muted" style="font-weight:500">'+o[1]+'</div></button>'}).join("")+'</div><label>Amount (DA)</label><div class="row" style="margin-bottom:10px">'+[1000,2500,5000].map(function(a){return '<button class="btn" data-amt="'+a+'" aria-pressed="'+(DN.amt===a)+'">'+a+'</button>'}).join("")+'</div><input type="number" id="amt" min="100" value="'+DN.amt+'" aria-label="Custom amount"><label style="margin-top:14px"><input type="checkbox" id="mo" '+(DN.mo?'checked':'')+' style="width:22px;height:22px;vertical-align:middle"> Make it monthly</label><label for="em" style="margin-top:12px">Email for receipt</label><input type="email" id="em" placeholder="you@example.com"><div class="err" id="e"></div><button class="btn help" id="pay" style="margin-top:8px">Donate '+DN.amt+' DA</button><p class="muted">Prototype: no real payment is taken.</p>';
+document.querySelectorAll("[data-org]").forEach(function(b){b.classList.toggle("on",+b.dataset.org===DN.org)})}
+function donated(){if(!DONE){location.hash="#/donate";return}app.innerHTML='<div class="ok"><div style="font-size:48px">💙</div><h2 class="t">Thank you</h2><p>Your '+DONE.amt+' DA'+(DONE.mo?' monthly':'')+' gift to <b>'+ORG[DONE.org][0]+'</b> was received.<br>Receipt sent to '+DONE.em+'.</p></div><a class="btn" href="#/" style="margin-top:12px">Back to map</a>'}
+function safety(){app.innerHTML='<h2 class="t">Evacuation checklist</h2><div class="alert" style="border-left-color:var(--l4)"><b>If you are told to evacuate, go now.</b> Do not wait to pack everything.</div><div class="card check"><label><input type="checkbox"> ID, phone, charger</label><label><input type="checkbox"> Medication and glasses</label><label><input type="checkbox"> Water and snacks</label><label><input type="checkbox"> Pets and carriers</label><label><input type="checkbox"> Close windows and doors</label><label><input type="checkbox"> Tell a neighbor where you are going</label></div><h3 class="s">Danger levels</h3>'+[4,3,2,1].map(function(l){return alertBox(l,LV[l].n,LV[l].d)}).join("")+'<a class="btn" href="#/components" style="margin-top:8px">Design system (components)</a>'}
+function comps(){app.innerHTML='<h2 class="t">Components</h2><p class="muted">Every component is a function that takes data and returns HTML, so a real feed can drive the whole UI.</p><h3 class="s">Danger badges</h3><div class="spec">'+[4,3,2,1].map(badge).join("")+'</div><h3 class="s">Map pins</h3><svg viewBox="0 0 100 20" class="map" style="background:#e7efdc">'+[4,3,2,1].map(function(l,k){return pin({id:0,name:"x",lvl:l,x:15+k*22,y:10},k===0)}).join("")+'</svg><p class="muted">First pin shows the selected state.</p><h3 class="s">Alerts</h3>'+[4,3,2,1].map(function(l){return alertBox(l,LV[l].n+" alert",LV[l].d+". Example message.")}).join("")+'<h3 class="s">Incident card</h3>'+incCard(INC[0])+'<h3 class="s">Live data demo</h3><button class="btn" id="add">+ Add a random incident from the “feed”</button><div style="margin-top:12px">'+mapSVG()+'</div><p class="muted" id="cnt">'+INC.length+' incidents on map</p><h3 class="s">Design tokens</h3><div class="card muted">Danger colors: Evacuate #b91c1c, Warning #c2410c, Watch #facc15, Advisory #1d4ed8. Each level also has a unique symbol and a word, so color is never the only signal. Minimum touch target 56px, body text 17px.</div>'}
+/* ===== Interactions ===== */
+function openSheet(id){var i=INC.filter(function(x){return x.id==id})[0];if(!i)return;sel=i.id;var m=$("map");if(m){var p=m.parentNode;m.outerHTML=mapSVG({rep:null})}
+$("sheet").innerHTML='<div class="sheet" role="dialog" aria-label="'+i.name+'"><div class="row" style="align-items:center"><div style="flex:3">'+badge(i.lvl)+'<h3 style="margin:4px 0">'+i.name+'</h3></div><button class="chip" id="cl" style="flex:0">Close</button></div><p style="margin:4px 0 10px">'+i.txt+'</p><div class="row"><a class="btn sm red" href="#/safety">Evacuation steps</a><a class="btn sm" href="#/report">Report update</a></div></div>'}
+app.addEventListener("click",function(e){var t=e.target,p=t.closest("[data-pin]"),f=t.closest("[data-fl]"),sz=t.closest("[data-size]"),pp=t.closest("[data-ppl]"),og=t.closest("[data-org]"),am=t.closest("[data-amt]"),v=t.closest("[data-vol]");
+if(p&&!t.closest("[data-pick]"))return openSheet(p.dataset.pin);
+if(f){var l=f.dataset.fl;fl[l]=fl[l]?0:1;return home()}
+var mp=t.closest("[data-pick]");if(mp){var r=mp.getBoundingClientRect();R.x=(e.clientX-r.left)/r.width*100;R.y=(e.clientY-r.top)/r.height*100;return report()}
+if(t.id==="loc"){R.x=46;R.y=52;return report()}
+if(t.id==="nx"){var er=$("e");if(R.step===1&&R.x==null)return er.textContent="Tap the map or use your location.";if(R.step===2&&(!R.size||!R.ppl))return er.textContent="Choose a size and answer the question.";R.step++;return report()}
+if(t.id==="bk"){R.step--;return report()}
+if(sz){R.size=sz.dataset.size;return report()}if(pp){R.ppl=pp.dataset.ppl;return report()}
+if(t.id==="send"){R.note=$("nt").value;SENT="FW-"+Math.floor(10000+Math.random()*90000);INC.push({id:INC.length+1,name:"New report (unverified)",lvl:2,x:R.x,y:R.y,r:6,ha:1,ago:0,status:"Awaiting verification",dir:"Reported just now",txt:"A resident reported a fire here. Responders are checking."});R={step:1,x:null,y:null,size:"",ppl:"",note:""};location.hash="#/sent";return}
+if(og){DN.org=+og.dataset.org;return donate()}
+if(am){DN.amt=+am.dataset.amt;return donate()}
+if(v){v.textContent="✓ Thank you, we'll contact you";v.disabled=true}
+if(t.id==="pay"){var a=+$("amt").value,em=$("em").value;DN.mo=$("mo").checked;if(!(a>=100))return $("e").textContent="Enter at least 100 DA.";if(!/^\S+@\S+\.\S+$/.test(em))return $("e").textContent="Enter a valid email for your receipt.";DONE={amt:a,org:DN.org,mo:DN.mo,em:em};DN.amt=a;location.hash="#/donated";return}
+if(t.id==="add"){var n=INC.length+1,lv=1+Math.floor(Math.random()*4);INC.push({id:n,name:"Feed incident "+n,lvl:lv,x:8+Math.random()*84,y:8+Math.random()*84,r:5+lv*2,ha:10*lv,ago:1,status:"Active",dir:"From live feed",txt:"Example incident added from data."});return comps()}});
+app.addEventListener("input",function(e){if(e.target.id==="amt"){var b=$("pay");if(b)b.textContent="Donate "+(e.target.value||0)+" DA"}});
+document.addEventListener("click",function(e){if(e.target.id==="cl"){sel=null;$("sheet").innerHTML="";var m=$("map");if(m)m.outerHTML=mapSVG()}});
+document.addEventListener("keydown",function(e){var p=e.target.closest&&e.target.closest("[data-pin]");if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openSheet(p.dataset.pin)}});
+route();
+</script>
+</body>
+</html>
